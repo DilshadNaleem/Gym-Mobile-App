@@ -15,6 +15,21 @@
         android:theme="@style/Theme.KolonnawaBarbellGym"
         tools:targetApi="31">
         <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".bottom_nav_menu"
+            android:exported="false" />
+        <activity
+            android:name=".Reset_Password"
+            android:exported="false" />
+        <activity
+            android:name=".ResetPassword"
+            android:exported="false" />
+        <activity
+            android:name=".MainDashboard"
+            android:exported="false" />
+        <activity
             android:name=".OTPVerification"
             android:exported="false" />
         <activity
