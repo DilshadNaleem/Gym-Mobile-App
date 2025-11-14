@@ -37,6 +37,9 @@ android {
             excludes += "/META-INF/{LICENSE*,NOTICE*,README*}"
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -44,6 +47,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -51,4 +56,5 @@ dependencies {
     // ✅ JavaMail dependencies for sending email directly from Android
     implementation("com.sun.mail:android-mail:1.6.7")
     implementation("com.sun.mail:android-activation:1.6.7")
+    implementation ("com.itextpdf:itext7-core:7.2.5")
 }

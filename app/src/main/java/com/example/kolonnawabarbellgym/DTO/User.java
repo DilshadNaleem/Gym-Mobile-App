@@ -12,6 +12,7 @@ public class User
     private String password;
     private int status;
     private String loggedIn;
+    private byte[] profileImagge;
 
     // Constructors
     public User() {}
@@ -24,7 +25,7 @@ public class User
         this.nic = nic;
         this.password = password;
         this.status = 0; // Default status
-        this.loggedIn = "unverify"; // Default loggedIn status
+        this.loggedIn = "unverify";// Default loggedIn status
     }
 
     // Getters and Setters
@@ -57,4 +58,12 @@ public class User
 
     public String getLoggedIn() { return loggedIn; }
     public void setLoggedIn(String loggedIn) { this.loggedIn = loggedIn; }
+
+    public byte[] getProfileImagge() {
+        return profileImagge;
+    }
+
+    public void setProfileImagge(byte[] profileImagge) {
+        this.profileImagge = profileImagge;
+    }
 }

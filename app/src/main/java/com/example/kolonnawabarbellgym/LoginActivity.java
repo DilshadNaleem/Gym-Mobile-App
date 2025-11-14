@@ -1,7 +1,10 @@
 package com.example.kolonnawabarbellgym;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private DatabaseHelperClass dbHelper;
     private LoginController loginController;
-
+    private static final String TAG = "LoginActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +92,8 @@ public class LoginActivity extends AppCompatActivity {
 
             // Navigate to main activity or home screen
             Intent intent = new Intent(LoginActivity.this, MainDashboard.class);
+            intent.putExtra("remail", email);
+            Log.d(TAG,"Login Using : " + email);
             startActivity(intent);
             finish(); // Close login activity
         } else {

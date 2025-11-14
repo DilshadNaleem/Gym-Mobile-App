@@ -6,12 +6,17 @@
         android:title="Dashboard" />
 
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/navigation_fee"
         android:icon="@drawable/ic_dashboard"
-        android:title="Home" />
+        android:title="Fee" />
 
     <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/ic_dashboard"
         android:title="Profile" />
+
+    <item
+        android:id="@+id/navigation_newuser"
+        android:icon="@drawable/ic_dashboard"
+        android:title="New User" />
 </menu>
