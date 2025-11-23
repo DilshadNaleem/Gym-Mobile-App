@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.kolonnawabarbellgym.Database.DatabaseHelperClass;
+import com.example.kolonnawabarbellgym.Mail.MailSender;
 
 public class ResetPassword extends AppCompatActivity {
 
@@ -70,7 +71,7 @@ public class ResetPassword extends AppCompatActivity {
         Log.d(TAG, "resetPassword: Method started");
 
         String password = etPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim(); // Fixed the .toString().toString()
+        String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         Log.d(TAG, "resetPassword: Password length: " + password.length());
         Log.d(TAG, "resetPassword: Confirm password length: " + confirmPassword.length());
@@ -122,6 +123,10 @@ public class ResetPassword extends AppCompatActivity {
 
         if (updatePassword(userEmail, password)) {
             Log.i(TAG, "resetPassword: Password updated successfully for: " + userEmail);
+
+            // Send notification email to user
+            sendPasswordChangeNotification(userEmail);
+
             Toast.makeText(ResetPassword.this, "Password Reset Successfully", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(ResetPassword.this, LoginActivity.class);
@@ -161,6 +166,32 @@ public class ResetPassword extends AppCompatActivity {
         } finally {
             db.close();
             Log.d(TAG, "updatePassword: Database closed");
+        }
+    }
+
+    private void sendPasswordChangeNotification(String userEmail) {
+        Log.d(TAG, "sendPasswordChangeNotification: Sending password change notification to: " + userEmail);
+
+        try {
+            String subject = "Password Changed Successfully - Kolonnawa Barbell Gym";
+            String message = "Dear User,\n\n" +
+                    "Your password has been successfully changed for your Kolonnawa Barbell Gym account.\n\n" +
+                    "If you did not initiate this password change, please contact our administrator immediately at:\n" +
+                    "Phone: 0725958832\n\n" +
+                    "Thank you for choosing Kolonnawa Barbell Gym!\n\n" +
+                    "Best regards,\n" +
+                    "Kolonnawa Barbell Gym Team";
+
+            // Create and start the email thread
+            MailSender mailSender = new MailSender(userEmail, subject, message);
+            mailSender.start();
+
+            Log.i(TAG, "sendPasswordChangeNotification: Password change notification sent successfully to: " + userEmail);
+
+        } catch (Exception e) {
+            Log.e(TAG, "sendPasswordChangeNotification: Failed to send notification email: " + e.getMessage(), e);
+            // Don't show error to user as password was still reset successfully
+            // Just log the error for debugging
         }
     }
 

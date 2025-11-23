@@ -1,5 +1,7 @@
 package com.example.kolonnawabarbellgym.Mail;
 
+import android.util.Log;
+
 import java.util.Properties;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -17,7 +19,7 @@ public class MailSender extends Thread {
     public void run() {
         try {
             final String senderEmail = "hypermarket403@gmail.com";
-            final String senderPassword = "akmn uzov llex andl";
+            final String senderPassword = "jaeh itgd annt fsqr";
             final String displayName = "Kolonnawa Barbell Gym";
 
             Properties props = new Properties();
@@ -25,6 +27,12 @@ public class MailSender extends Thread {
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.host", "smtp.gmail.com");
             props.put("mail.smtp.port", "587");
+            props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+            // Add timeout settings (crucial!)
+            props.put("mail.smtp.timeout", "30000"); // 30 seconds
+            props.put("mail.smtp.connectiontimeout", "30000"); // 30 seconds
+            props.put("mail.smtp.writetimeout", "30000"); // 30 seconds
 
             Session session = Session.getInstance(props, new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -39,8 +47,10 @@ public class MailSender extends Thread {
             message.setText(messageBody);
 
             Transport.send(message);
+
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e("MailSender", "Email sending failed: " + e.getMessage());
         }
     }
 }

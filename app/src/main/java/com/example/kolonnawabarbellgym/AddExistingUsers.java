@@ -55,7 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class AddUser extends BaseActivity {
+public class AddExistingUsers extends BaseActivity {
 
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int STORAGE_PERMISSION_CODE = 101;
@@ -100,10 +100,10 @@ public class AddUser extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_user);
+        setContentView(R.layout.activity_add_existing_users);
 
-        currentNavItemId = R.id.navigation_newuser;
-        setupBottomNavigation(R.id.navigation_newuser);
+        currentNavItemId = R.id.navigation_existinguser;
+        setupBottomNavigation(R.id.navigation_existinguser);
 
         // Initialize database helper
         databaseHelper = new DatabaseHelperClass(this);
@@ -239,12 +239,8 @@ public class AddUser extends BaseActivity {
             return;
         }
 
-        // Get status from radio buttons
-        int status = 0; // Default to 0 (No)
-        int selectedId = statusRadioGroup.getCheckedRadioButtonId();
-        if (selectedId == R.id.radioYes) {
-            status = 1;
-        }
+        // For existing users, status is always 2 (Old Member)
+        int status = 2;
 
         // Insert into database and get the actual member ID that was inserted
         String insertedMemberId = insertUserIntoDatabase(firstName, lastName, email, phoneNumber, nic, profileImageBytes, monthlyFee, status);
@@ -254,16 +250,16 @@ public class AddUser extends BaseActivity {
                 generateUserPDF(insertedMemberId, firstName, lastName, email, phoneNumber, nic, monthlyFee, status);
                 clearForm();
             } else {
-                Toast.makeText(this, "Failed to add user to database", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Failed to add existing user to database", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Failed to add user", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to add existing user", Toast.LENGTH_SHORT).show();
         }
     }
 
     public String insertUserIntoDatabase(String firstName, String lastName,
-                                          String email, String phoneNumber, String nic,
-                                          byte[] profileImage, String monthlyFee, int status) {
+                                         String email, String phoneNumber, String nic,
+                                         byte[] profileImage, String monthlyFee, int status) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
         // Get the next member ID
@@ -341,7 +337,7 @@ public class AddUser extends BaseActivity {
         try {
             // Create PDF file in app-specific directory
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String fileName = "Member_" + firstName + "_" + lastName + "_" + timeStamp + ".pdf";
+            String fileName = "Existing_Member_" + firstName + "_" + lastName + "_" + timeStamp + ".pdf";
 
             // Use app-specific directory (no permissions needed)
             File documentsDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
@@ -404,18 +400,18 @@ public class AddUser extends BaseActivity {
             logo.setHeight(120);
             logo.setHorizontalAlignment(HorizontalAlignment.LEFT);
 
-            // Add gym name and title
+            // Add gym name and title with different color for existing member
             Paragraph gymName = new Paragraph("KOLONNAWA BARBELL GYM")
                     .setBold()
                     .setFontSize(18)
-                    .setFontColor(new DeviceRgb(0, 51, 102)) // Dark blue color
+                    .setFontColor(new DeviceRgb(139, 0, 0)) // Dark red color for existing members
                     .setTextAlignment(TextAlignment.LEFT)
                     .setMarginBottom(5);
 
-            Paragraph title = new Paragraph("Member Registration Certificate")
+            Paragraph title = new Paragraph("Existing Member Registration")
                     .setBold()
                     .setFontSize(14)
-                    .setFontColor(new DeviceRgb(0, 0, 0))
+                    .setFontColor(new DeviceRgb(139, 0, 0)) // Dark red color
                     .setTextAlignment(TextAlignment.LEFT);
 
             // Create cell for text content
@@ -436,10 +432,10 @@ public class AddUser extends BaseActivity {
 
             document.add(headerTable);
 
-            // Add separator line
+            // Add separator line with dark red color
             Paragraph separator = new Paragraph("")
                     .setHeight(2)
-                    .setBackgroundColor(new DeviceRgb(0, 51, 102)) // Dark blue line
+                    .setBackgroundColor(new DeviceRgb(139, 0, 0)) // Dark red line
                     .setMarginTop(10)
                     .setMarginBottom(20);
             document.add(separator);
@@ -450,12 +446,12 @@ public class AddUser extends BaseActivity {
             Paragraph gymName = new Paragraph("KOLONNAWA BARBELL GYM")
                     .setBold()
                     .setFontSize(20)
-                    .setFontColor(new DeviceRgb(0, 51, 102))
+                    .setFontColor(new DeviceRgb(139, 0, 0))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setMarginTop(20)
                     .setMarginBottom(5);
 
-            Paragraph title = new Paragraph("Member Registration Certificate")
+            Paragraph title = new Paragraph("Existing Member Registration")
                     .setBold()
                     .setFontSize(16)
                     .setTextAlignment(TextAlignment.CENTER)
@@ -475,15 +471,15 @@ public class AddUser extends BaseActivity {
         containerTable.setWidth(PageSize.A4.getWidth() - 72);
         containerTable.setHorizontalAlignment(HorizontalAlignment.CENTER);
         containerTable.setMarginBottom(30);
-        containerTable.setBorder(new SolidBorder(new DeviceRgb(0, 51, 102), 2)); // Blue border
+        containerTable.setBorder(new SolidBorder(new DeviceRgb(139, 0, 0), 2)); // Dark red border
 
         // Add section title
-        Paragraph sectionTitle = new Paragraph("Member Information")
+        Paragraph sectionTitle = new Paragraph("Existing Member Information")
                 .setBold()
                 .setFontSize(16)
                 .setFontColor(ColorConstants.WHITE)
                 .setTextAlignment(TextAlignment.CENTER)
-                .setBackgroundColor(new DeviceRgb(0, 51, 102)) // Blue background
+                .setBackgroundColor(new DeviceRgb(139, 0, 0)) // Dark red background
                 .setPadding(10);
 
         Cell titleCell = new Cell();
@@ -507,8 +503,8 @@ public class AddUser extends BaseActivity {
         Table detailsTable = new Table(2);
         detailsTable.setWidth(350);
 
-        // Define colors
-        Color labelColor = new DeviceRgb(240, 240, 240); // Light gray for labels
+        // Define colors - using warmer colors for existing members
+        Color labelColor = new DeviceRgb(255, 240, 240); // Light red tint for labels
         Color valueColor = ColorConstants.WHITE; // White for values
 
         // Add member details with better styling - USE THE PASSED memberId
@@ -520,11 +516,11 @@ public class AddUser extends BaseActivity {
         addStyledTableRow(detailsTable, "NIC:", nic.isEmpty() ? "N/A" : nic, labelColor, valueColor);
         addStyledTableRow(detailsTable, "Monthly Fee:", monthlyFee.isEmpty() ? "N/A" : "Rs. " + monthlyFee, labelColor, valueColor);
 
-        // Use "Admission Paid/Unpaid" instead of "Active Status"
-        String admissionStatus = status == 1 ? "Admission Paid" : "Admission Unpaid";
-        addStyledTableRow(detailsTable, "Admission Status:", admissionStatus, labelColor, valueColor);
+        // For existing members, show "Returning Member" status
+        String memberStatus = "Returning Member";
+        addStyledTableRow(detailsTable, "Member Type:", memberStatus, labelColor, valueColor);
 
-        addStyledTableRow(detailsTable, "Registration Date:",
+        addStyledTableRow(detailsTable, "Re-registration Date:",
                 new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date()), labelColor, valueColor);
 
         detailsCell.add(detailsTable);
@@ -556,7 +552,7 @@ public class AddUser extends BaseActivity {
                 profileImage.setWidth(100);
                 profileImage.setHeight(120);
                 profileImage.setHorizontalAlignment(HorizontalAlignment.CENTER);
-                profileImage.setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+                profileImage.setBorder(new SolidBorder(new DeviceRgb(139, 0, 0), 1)); // Dark red border
 
                 imageCell.add(profileImage);
             } catch (Exception e) {
@@ -611,9 +607,9 @@ public class AddUser extends BaseActivity {
     }
 
     private void addFooter(Document document) {
-        Paragraph footer = new Paragraph("\nThis certificate confirms that the above mentioned person is a registered member of Kolonnawa Barbell Gym.\n")
+        Paragraph footer = new Paragraph("\nThis certificate confirms that the above mentioned person is a registered returning member of Kolonnawa Barbell Gym.\n")
                 .setFontSize(10)
-                .setFontColor(ColorConstants.DARK_GRAY)
+                .setFontColor(new DeviceRgb(139, 0, 0)) // Dark red color
                 .setTextAlignment(TextAlignment.CENTER)
                 .setItalic();
 
@@ -657,9 +653,9 @@ public class AddUser extends BaseActivity {
                 int x = 100 + (i % 2) * 200;
                 int y = 100 + (i / 2) * 250;
 
-                Paragraph textWatermark = new Paragraph("KOLONNAWA GYM")
+                Paragraph textWatermark = new Paragraph("EXISTING MEMBER")
                         .setFontSize(20)
-                        .setFontColor(new DeviceRgb(200, 200, 200), 0.08f) // Very light gray
+                        .setFontColor(new DeviceRgb(255, 200, 200), 0.08f) // Light red tint
                         .setTextAlignment(TextAlignment.CENTER)
                         .setRotationAngle(Math.toRadians(45))
                         .setFixedPosition(x, y, 150);
@@ -675,9 +671,9 @@ public class AddUser extends BaseActivity {
                     int x = 50 + (i % 3) * 180;
                     int y = 150 + (i / 3) * 150;
 
-                    Paragraph watermark = new Paragraph("KOLONNAWA GYM")
+                    Paragraph watermark = new Paragraph("EXISTING MEMBER")
                             .setFontSize(24)
-                            .setFontColor(new DeviceRgb(200, 200, 200), 0.1f)
+                            .setFontColor(new DeviceRgb(255, 200, 200), 0.1f)
                             .setTextAlignment(TextAlignment.CENTER)
                             .setRotationAngle(Math.toRadians(45))
                             .setFixedPosition(x, y, 200);
@@ -693,10 +689,10 @@ public class AddUser extends BaseActivity {
     private void showPDFSuccessDialog(File pdfFile, String fileName) {
         new AlertDialog.Builder(this)
                 .setTitle("Success!")
-                .setMessage("✓ Member registered successfully!\n✓ PDF certificate generated: " + fileName)
+                .setMessage("✓ Existing member registered successfully!\n✓ PDF certificate generated: " + fileName)
                 .setPositiveButton("View & Share PDF", (dialog, which) -> viewAndSharePDF(pdfFile))
                 .setNegativeButton("OK", (dialog, which) -> {
-                    Toast.makeText(this, "Member registration completed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Existing member registration completed!", Toast.LENGTH_SHORT).show();
                 })
                 .show();
     }
@@ -716,12 +712,12 @@ public class AddUser extends BaseActivity {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("application/pdf");
             shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Kolonnawa Barbell Gym - Member Registration");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Member registration certificate from Kolonnawa Barbell Gym");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Kolonnawa Barbell Gym - Existing Member Registration");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Existing member registration certificate from Kolonnawa Barbell Gym");
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             // Create chooser with both options
-            Intent chooserIntent = Intent.createChooser(viewIntent, "Member Certificate");
+            Intent chooserIntent = Intent.createChooser(viewIntent, "Existing Member Certificate");
             chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { shareIntent });
 
             startActivity(chooserIntent);
@@ -738,7 +734,7 @@ public class AddUser extends BaseActivity {
         etPhoneNumber.setText("");
         etNIC.setText("");
         etMonthlyFee.setText("");
-        statusRadioGroup.check(R.id.radioNo);
+        statusRadioGroup.clearCheck(); // Clear radio buttons since status is fixed
         deleteImage(); // This will reset the image
     }
 

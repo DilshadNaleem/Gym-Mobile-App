@@ -8,13 +8,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHelperClass extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "Gym_DB";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 9;
 
     private static final String CREATE_USER_TABLE = "CREATE TABLE users(" +
             "userid INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -54,8 +55,237 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
             "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
             "FOREIGN KEY (unique_id) REFERENCES new_users(unique_id));";
 
+    private static final String CREATE_EXPENSE_TABLE = "CREATE TABLE expenses(" +
+            "expense_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "description TEXT NOT NULL," +
+            "image BLOB," +
+            "price REAL NOT NULL," +
+            "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
-    // Add these methods to your DatabaseHelperClass
+    public DatabaseHelperClass (@Nullable Context context)
+    {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db)
+    {
+        db.execSQL(CREATE_USER_TABLE);
+        db.execSQL(CREATE_NEW_USER_TABLE);
+        db.execSQL(CREATE_PAYMENT_TABLE);
+        db.execSQL(CREATE_EXPENSE_TABLE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Create expenses table if it doesn't exist (for versions that didn't have it)
+        if (oldVersion < DATABASE_VERSION) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS expenses(" +
+                    "expense_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "description TEXT NOT NULL," +
+                    "image BLOB," +
+                    "price REAL NOT NULL," +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+        }
+
+        db.execSQL("DROP TABLE IF EXISTS categories");
+
+        // Remove the categories table logic since you don't need it
+    }
+
+    // Add these missing methods:
+
+    public boolean exportDatabase(String destinationPath) {
+        try {
+            File currentDB = new File(getReadableDatabase().getPath());
+            File backupDB = new File(destinationPath);
+
+            if (currentDB.exists()) {
+                // Create parent directories if they don't exist
+                File parentDir = backupDB.getParentFile();
+                if (parentDir != null && !parentDir.exists()) {
+                    parentDir.mkdirs();
+                }
+
+                java.io.FileInputStream fis = new java.io.FileInputStream(currentDB);
+                java.io.FileOutputStream fos = new java.io.FileOutputStream(backupDB);
+
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = fis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, length);
+                }
+
+                fos.flush();
+                fos.close();
+                fis.close();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean importDatabase(String sourcePath) {
+        try {
+            File currentDB = new File(getWritableDatabase().getPath());
+            File backupDB = new File(sourcePath);
+
+            if (backupDB.exists()) {
+                // Close the database before importing
+                close();
+
+                java.io.FileInputStream fis = new java.io.FileInputStream(backupDB);
+                java.io.FileOutputStream fos = new java.io.FileOutputStream(currentDB);
+
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = fis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, length);
+                }
+
+                fos.flush();
+                fos.close();
+                fis.close();
+
+                // Reopen the database
+                getWritableDatabase();
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean mergeDatabases(String sourcePath) {
+        SQLiteDatabase sourceDb = null;
+        SQLiteDatabase targetDb = getWritableDatabase();
+
+        try {
+            sourceDb = SQLiteDatabase.openDatabase(sourcePath, null, SQLiteDatabase.OPEN_READONLY);
+            targetDb.beginTransaction();
+
+            // Merge new_users table
+            Cursor cursor = sourceDb.rawQuery("SELECT * FROM new_users", null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String phone = cursor.getString(cursor.getColumnIndexOrThrow("phoneNumber"));
+                    String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
+
+                    if (!isUserExists(targetDb, phone, email)) {
+                        ContentValues values = new ContentValues();
+                        values.put("unique_id", getNextAvailableMemberId(targetDb));
+                        values.put("firstName", cursor.getString(cursor.getColumnIndexOrThrow("firstName")));
+                        values.put("lastName", cursor.getString(cursor.getColumnIndexOrThrow("lastName")));
+                        values.put("email", email);
+                        values.put("phoneNumber", phone);
+                        values.put("nic", cursor.getString(cursor.getColumnIndexOrThrow("nic")));
+                        values.put("profileImage", cursor.getBlob(cursor.getColumnIndexOrThrow("profileImage")));
+                        values.put("monthlyFee", cursor.getString(cursor.getColumnIndexOrThrow("monthlyFee")));
+                        values.put("status", cursor.getInt(cursor.getColumnIndexOrThrow("status")));
+
+                        targetDb.insert("new_users", null, values);
+                    }
+                } while (cursor.moveToNext());
+                cursor.close();
+            }
+
+            targetDb.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (targetDb != null) targetDb.endTransaction();
+            if (sourceDb != null) sourceDb.close();
+        }
+    }
+
+    private boolean isUserExists(SQLiteDatabase db, String phone, String email) {
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM new_users WHERE phoneNumber = ? OR email = ?",
+                new String[]{phone, email}
+        );
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+
+    private String getNextAvailableMemberId(SQLiteDatabase db) {
+        String nextMemberId = null;
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery("SELECT unique_id FROM new_users ORDER BY userid DESC LIMIT 1", null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                String lastUniqueId = cursor.getString(cursor.getColumnIndexOrThrow("unique_id"));
+
+                if (lastUniqueId != null && lastUniqueId.startsWith("mem_")) {
+                    try {
+                        String numberPart = lastUniqueId.substring(4);
+                        int nextNumber = Integer.parseInt(numberPart) + 1;
+                        nextMemberId = "mem_" + String.format("%02d", nextNumber);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        nextMemberId = "mem_01";
+                    }
+                } else {
+                    nextMemberId = "mem_01";
+                }
+            } else {
+                nextMemberId = "mem_01";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            nextMemberId = "mem_01";
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return nextMemberId;
+    }
+
+    public StatusData getStatusData() {
+        StatusData data = new StatusData();
+        SQLiteDatabase db = getReadableDatabase();
+
+        // Total members
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM new_users", null);
+        if (cursor != null && cursor.moveToFirst()) {
+            data.totalMembers = cursor.getInt(0);
+            cursor.close();
+        }
+
+        // Database size
+        File dbFile = new File(db.getPath());
+        if (dbFile.exists()) {
+            long sizeInBytes = dbFile.length();
+            long sizeInKB = sizeInBytes / 1024;
+            data.dbSize = sizeInKB + " KB";
+        } else {
+            data.dbSize = "0 KB";
+        }
+
+        // Last backup
+        data.lastBackup = "Never";
+
+        return data;
+    }
+
+    // Status data class
+    public static class StatusData {
+        public int totalMembers;
+        public String dbSize;
+        public String lastBackup;
+    }
+
+    // Your existing methods:
+
     public Cursor getAllNewUsers() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query("new_users",
@@ -101,27 +331,6 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
                 null, null, null);
     }
 
-    public DatabaseHelperClass (@Nullable Context context)
-    {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db)
-    {
-        db.execSQL(CREATE_USER_TABLE);
-        db.execSQL(CREATE_NEW_USER_TABLE);
-        db.execSQL(CREATE_PAYMENT_TABLE);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-       db.execSQL("DROP TABLE IF EXISTS users");
-       db.execSQL("DROP TABLE IF EXISTS new_users");
-       db.execSQL("DROP TABLE IF EXISTS payment");
-        onCreate(db);
-    }
-
     public List<String> getPaidMonthsForUser(String userUniqueId) {
         List<String> paidMonths = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -158,8 +367,6 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
         long result = db.insert("payment", null, values);
         return result != -1;
     }
-
-
 
     public SQLiteDatabase openDB()
     {

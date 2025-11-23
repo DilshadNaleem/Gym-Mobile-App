@@ -19,4 +19,11 @@
         android:id="@+id/navigation_newuser"
         android:icon="@drawable/ic_dashboard"
         android:title="New User" />
+
+    <item
+        android:id="@+id/navigation_existinguser"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Existing User" />
+
+
 </menu>

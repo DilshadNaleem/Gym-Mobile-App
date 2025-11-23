@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.kolonnawabarbellgym.Database.DatabaseManagementActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class BaseActivity extends AppCompatActivity {
@@ -79,7 +80,17 @@ public class BaseActivity extends AppCompatActivity {
                     overridePendingTransition(0,0);
                     finish();
                     return true;
+                } else if (itemId == R.id.navigation_existinguser) {
+                    Intent intent = new Intent(BaseActivity.this, AddExistingUsers.class);
+                    if (userEmail != null) {
+                        intent.putExtra("remail", userEmail);
+                    }
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
                 }
+
                 return false;
             }
         });
