@@ -1,10 +1,12 @@
 package com.example.kolonnawabarbellgym;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,10 +31,13 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
     private FloatingActionButton fabRefresh;
     private DashboardPresenter presenter;
     private ProgressBar progressBar;
+    private TextView tvTodayExpenses, tvTotalExpenses;
+    private ImageButton btnAddExpense;
 
     // TextViews for displaying data
-    private TextView tvTodaySales, tvTotalSales, tvPendingAdmission, tvExistingMembers;
-    private TextView tvTotalMembers, tvPaidMembers, tvPendingMembers;
+    private TextView tvTodaySales, tvTotalSales, tvTotalAmount, tvPendingAdmission, tvExistingMembers;
+    private TextView tvTotalMembers, tvPaidMembers, tvPendingMembers, tvOtherAmountLabel, tvOtherAmounts;
+    private TextView tvTodayProfit, tvTotalProfit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,7 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
 
         initializeViews();
         setupPresenter();
-        setupButtonListeners();
+        setupClickListeners(); // Changed from setupButtonListeners()
 
         // Get user email from intent
         userEmail = getIntent().getStringExtra("remail");
@@ -68,14 +73,22 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
 
         // Initialize sales TextViews
         tvTodaySales = findViewById(R.id.tvTodaySales);
-        tvTotalSales = findViewById(R.id.tvTotalSales);
+        tvTotalSales = findViewById(R.id.tvTotalSales); // This now shows Total Admission Price
+        tvTotalAmount = findViewById(R.id.tvTotalAmount); // New TextView for Total Amount Received
         tvPendingAdmission = findViewById(R.id.tvPendingAdmission);
         tvExistingMembers = findViewById(R.id.tvExistingMembers);
+        tvOtherAmountLabel = findViewById(R.id.tvOtherAmountsLabel);
+        tvOtherAmounts = findViewById(R.id.tvOtherAmounts);
 
         // Initialize member count TextViews
         tvTotalMembers = findViewById(R.id.tvTotalMembers);
         tvPaidMembers = findViewById(R.id.tvPaidMembers);
         tvPendingMembers = findViewById(R.id.tvPendingMembers);
+        tvTodayExpenses = findViewById(R.id.tvTodayExpenses);
+        tvTotalExpenses = findViewById(R.id.tvTotalExpenses);
+        btnAddExpense = findViewById(R.id.btnAddExpense);
+        tvTodayProfit = findViewById(R.id.tvTodayProfit);
+        tvTotalProfit = findViewById(R.id.tvTotalProfit);
     }
 
     private void setupPresenter() {
@@ -89,7 +102,8 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
         }
     }
 
-    private void setupButtonListeners() {
+    private void setupClickListeners() {
+        // Button to navigate to DatabaseManagementActivity
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,12 +116,122 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
             }
         });
 
+        // Refresh button
         fabRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 refreshData();
             }
         });
+
+        tvTodayExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToTodayExpenses();
+            }
+        });
+
+        // Total expenses click - navigate to all expenses
+        tvTotalExpenses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToAllExpenses();
+            }
+        });
+
+        // Add expense button
+        btnAddExpense.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToAddExpense();
+            }
+        });
+
+        // Profit click listeners
+        setupProfitClickListeners();
+
+        setupTodaySalesClick();
+        // Existing Members click listener
+        setupExistingMembersClick();
+        setUpTotalAdmissionPrice();
+        setupOtherAmountsClick();
+    }
+
+    private void setupProfitClickListeners() {
+        tvTodayProfit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Show today's profit breakdown in popup (existing functionality)
+                if (presenter != null) {
+                    DashboardPresenter.ProfitBreakdown breakdown = presenter.getTodayProfitBreakdown();
+                    showProfitBreakdown(breakdown);
+                }
+            }
+        });
+
+        // Total profit click - NEW: Navigate to Profit Analysis Activity
+        tvTotalProfit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToProfitAnalysis();
+            }
+        });
+    }
+
+    private void navigateToProfitAnalysis() {
+        Intent intent = new Intent(MainDashboard.this, ProfitAnalyticsActivity.class);
+        if (userEmail != null) {
+            intent.putExtra("remail", userEmail);
+        }
+        startActivity(intent);
+    }
+
+    private void showProfitBreakdown(DashboardPresenter.ProfitBreakdown breakdown) {
+        // Extract values from the breakdown object
+        String title = breakdown.getTitle(); // or breakdown.title if it's public
+        double income = breakdown.getIncome(); // or breakdown.income
+        double expenses = breakdown.getExpenses(); // or breakdown.expenses
+        double profit = breakdown.getProfit(); // or breakdown.profit
+
+        String message = String.format(Locale.getDefault(),
+                "%s\n\n" +
+                        "💰 Income: %s\n" +
+                        "💸 Expenses: %s\n" +
+                        "📊 Profit: %s\n\n" +
+                        "Formula: Income - Expenses = Profit",
+                title,
+                formatCurrency(income),
+                formatCurrency(expenses),
+                formatCurrency(profit));
+
+        new AlertDialog.Builder(this)
+                .setTitle("Profit Calculation")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private String formatCurrency(double amount) {
+        NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("si", "LK"));
+        format.setMaximumFractionDigits(2);
+        return format.format(amount);
+    }
+
+    private void setupExistingMembersClick() {
+        tvExistingMembers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToExistingMembers();
+            }
+        });
+    }
+
+    private void navigateToExistingMembers() {
+        Intent intent = new Intent(MainDashboard.this, ExistingMemberActivity.class);
+        if (userEmail != null) {
+            intent.putExtra("remail", userEmail);
+        }
+        startActivity(intent);
     }
 
     private void refreshData() {
@@ -129,9 +253,19 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
 
                     // Update sales data
                     tvTodaySales.setText(format.format(salesData.getTodaySales()));
-                    tvTotalSales.setText(format.format(salesData.getTotalSales()));
+                    tvTotalSales.setText(format.format(salesData.getTotalSales())); // Total Admission Price
+                    tvTotalAmount.setText(format.format(salesData.getTotalAmountOfPrices())); // Total Amount Received
                     tvPendingAdmission.setText(format.format(salesData.getPendingAdmissionFees()));
                     tvExistingMembers.setText(format.format(salesData.getExistingMembersFees()));
+                    tvOtherAmounts.setText(format.format(salesData.getOtherAmount()));
+
+                    // Update expense data
+                    tvTodayExpenses.setText(format.format(salesData.getTodayExpenses()));
+                    tvTotalExpenses.setText(format.format(salesData.getTotalExpenses()));
+
+                    // Update profit data - ADD THESE LINES
+                    tvTodayProfit.setText(format.format(salesData.getTodayProfit()));
+                    tvTotalProfit.setText(format.format(salesData.getTotalProfit()));
 
                     // Update member counts
                     tvTotalMembers.setText(String.valueOf(salesData.getTotalMembers()));
@@ -140,6 +274,8 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
 
                     // Update visual indicators
                     updateVisualIndicators(salesData);
+                    updateExpenseVisualIndicators(salesData);
+                    updateProfitVisualIndicators(salesData); // ADD THIS LINE
 
                 } catch (Exception e) {
                     Log.e("MainDashboard", "Error updating UI: " + e.getMessage());
@@ -151,7 +287,10 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
     private void updateVisualIndicators(SalesData salesData) {
         // Reset backgrounds
         tvTodaySales.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvTotalAmount.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         tvPendingAdmission.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvExistingMembers.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvOtherAmounts.setBackgroundColor(getResources().getColor(android.R.color.transparent));
 
         // Highlight if there are pending admissions
         if (salesData.getPendingAdmissionFees() > 0) {
@@ -161,6 +300,75 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
         // Highlight if today's sales are good
         if (salesData.getTodaySales() > 0) {
             tvTodaySales.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+        }
+
+        // Highlight total amount received
+        if (salesData.getTotalAmountOfPrices() > 0) {
+            tvTotalAmount.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+        }
+
+        // Highlight if there are existing members with unpaid fees
+        if (salesData.getExistingMembersFees() > 0) {
+            tvExistingMembers.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+        }
+
+        if (salesData.getOtherAmount() > 0) {
+            tvOtherAmounts.setBackgroundColor(getResources().getColor(android.R.color.holo_purple));
+        }
+    }
+
+    private void updateExpenseVisualIndicators(SalesData salesData) {
+        // Reset backgrounds for expense views
+        tvTodayExpenses.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvTotalExpenses.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+
+        // Highlight if there are expenses today
+        if (salesData.getTodayExpenses() > 0) {
+            tvTodayExpenses.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+        }
+
+        // Highlight total expenses
+        if (salesData.getTotalExpenses() > 0) {
+            tvTotalExpenses.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+        }
+    }
+
+    // ADD THIS METHOD FOR PROFIT VISUAL INDICATORS
+    private void updateProfitVisualIndicators(SalesData salesData) {
+        // Reset backgrounds for profit views
+        tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+
+        // Reset text colors
+        tvTodayProfit.setTextColor(getResources().getColor(android.R.color.black));
+        tvTotalProfit.setTextColor(getResources().getColor(android.R.color.black));
+
+        // Highlight today's profit - green for profit, red for loss
+        if (salesData.getTodayProfit() > 0) {
+            // Profit - green background
+            tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+        } else if (salesData.getTodayProfit() < 0) {
+            // Loss - red background
+            tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            // Break-even - yellow background
+            tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+        }
+
+        // Highlight total profit - green for profit, red for loss
+        if (salesData.getTotalProfit() > 0) {
+            // Profit - green background
+            tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+        } else if (salesData.getTotalProfit() < 0) {
+            // Loss - red background
+            tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            // Break-even - yellow background
+            tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
         }
     }
 
@@ -215,5 +423,77 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
         if (presenter != null) {
             presenter.detachView();
         }
+    }
+
+    private void setupTodaySalesClick() {
+        tvTodaySales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToTodaySales();
+            }
+        });
+    }
+
+    private void navigateToTodaySales() {
+        Intent intent = new Intent(MainDashboard.this, TodaySalesActivity.class);
+        if (userEmail != null) {
+            intent.putExtra("remail", userEmail);
+        }
+        startActivity(intent);
+    }
+
+    private void setUpTotalAdmissionPrice()
+    {
+        tvTotalSales.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainDashboard.this, TotalSalesActivity.class);
+                {
+                    if (userEmail != null) {
+                        intent.putExtra("remail", userEmail);
+                    }
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+
+    private void setupOtherAmountsClick() {
+        tvOtherAmounts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToOtherAmounts();
+            }
+        });
+    }
+
+    private void navigateToOtherAmounts() {
+        Intent intent = new Intent(MainDashboard.this,OtherAmounts.class);
+        startActivity(intent);
+        Toast.makeText(this, "Other Amounts Details - Implement this screen", Toast.LENGTH_SHORT).show();
+    }
+
+    private void navigateToTodayExpenses() {
+        Intent intent = new Intent(MainDashboard.this, TodayExpensesActivity.class);
+        if (userEmail != null) {
+            intent.putExtra("remail", userEmail);
+        }
+        startActivity(intent);
+    }
+
+    private void navigateToAllExpenses() {
+        Intent intent = new Intent(MainDashboard.this, AllExpensesActivity.class);
+        if (userEmail != null) {
+            intent.putExtra("remail", userEmail);
+        }
+        startActivity(intent);
+    }
+
+    private void navigateToAddExpense() {
+        Intent intent = new Intent(MainDashboard.this, AddExpenseActivity.class);
+        if (userEmail != null) {
+            intent.putExtra("remail", userEmail);
+        }
+        startActivity(intent);
     }
 }

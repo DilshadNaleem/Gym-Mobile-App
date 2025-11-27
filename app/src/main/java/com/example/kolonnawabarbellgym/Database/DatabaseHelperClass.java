@@ -5,17 +5,24 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.kolonnawabarbellgym.Model.OtherAmount;
+
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class DatabaseHelperClass extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "Gym_DB";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 12;
 
     private static final String CREATE_USER_TABLE = "CREATE TABLE users(" +
             "userid INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -53,6 +60,8 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
             "handovered_to TEXT," +
             "sessioned_email TEXT," +
             "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+            "other_description TEXT," +
+            "other_amount REAL,"+
             "FOREIGN KEY (unique_id) REFERENCES new_users(unique_id));";
 
     private static final String CREATE_EXPENSE_TABLE = "CREATE TABLE expenses(" +
@@ -86,9 +95,24 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
                     "image BLOB," +
                     "price REAL NOT NULL," +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS payment(" +
+                    "payment_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "unique_id TEXT," +
+                    "firstname TEXT," +
+                    "lastname TEXT," +
+                    "month TEXT," +
+                    "price REAL," +
+                    "handovered_to TEXT," +
+                    "sessioned_email TEXT," +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                    "other_description TEXT," +
+                    "other_amount REAL," +
+                    "FOREIGN KEY (unique_id) REFERENCES new_users(unique_id))");
         }
 
-        db.execSQL("DROP TABLE IF EXISTS categories");
+
+        //db.execSQL("DROP TABLE IF EXISTS payment");
 
         // Remove the categories table logic since you don't need it
     }
@@ -358,13 +382,48 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        // Get current time in proper format
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String currentTime = sdf.format(calendar.getTime());
+
+        Log.d("DB_DEBUG", "Java current time: " + currentTime);
+
         values.put("unique_id", userUniqueId);
         values.put("firstname", userName);
         values.put("month", monthYear);
         values.put("price", amount);
         values.put("handovered_to", handoveredBy);
+        values.put("created_at", currentTime); // Override the default
 
         long result = db.insert("payment", null, values);
+        Log.d("DB_DEBUG", "savePaymentRecord - After insert, result: " + result);
+
+        return result != -1;
+    }
+
+    public boolean saveOtherPaymentRecord(String userUniqueId, String userName,
+                                          String description, String amount, String handoveredBy) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // Get current time in proper format
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String currentTime = sdf.format(calendar.getTime());
+
+        Log.d("DB_DEBUG", "Java current time: " + currentTime);
+
+        values.put("unique_id", userUniqueId);
+        values.put("firstname", userName);
+        values.put("other_description", description);
+        values.put("other_amount", amount);
+        values.put("handovered_to", handoveredBy);
+        values.put("created_at", currentTime); // Override the default
+
+        long result = db.insert("payment", null, values);
+        Log.d("DB_DEBUG", "saveOtherPaymentRecord - After insert, result: " + result);
+
         return result != -1;
     }
 
@@ -410,4 +469,118 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
         int rowsAffected = db.update("users", values, "email=?", new String[]{email});
         return rowsAffected > 0;
     }
+
+
+    // Add this method to your DatabaseHelperClass
+    public List<OtherAmount> getAllOtherAmounts() {
+        List<OtherAmount> otherAmounts = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT p.payment_id, p.unique_id, p.firstname, p.lastname, p.month, " +
+                    "p.price, p.handovered_to, p.sessioned_email, p.created_at, " +
+                    "p.other_description, p.other_amount, nu.profileImage " +
+                    "FROM payment p " +
+                    "LEFT JOIN new_users nu ON p.unique_id = nu.unique_id " +
+                    "WHERE p.other_amount IS NOT NULL AND p.other_amount > 0 " +
+                    "ORDER BY p.created_at DESC";
+
+            cursor = db.rawQuery(query, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    int paymentId = cursor.getInt(cursor.getColumnIndexOrThrow("payment_id"));
+                    String uniqueId = cursor.getString(cursor.getColumnIndexOrThrow("unique_id"));
+                    String firstName = cursor.getString(cursor.getColumnIndexOrThrow("firstname"));
+                    String lastName = cursor.getString(cursor.getColumnIndexOrThrow("lastname"));
+                    String month = cursor.getString(cursor.getColumnIndexOrThrow("month"));
+                    double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+                    String handoveredTo = cursor.getString(cursor.getColumnIndexOrThrow("handovered_to"));
+                    String sessionedEmail = cursor.getString(cursor.getColumnIndexOrThrow("sessioned_email"));
+                    String createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow("other_description"));
+                    double otherAmount = cursor.getDouble(cursor.getColumnIndexOrThrow("other_amount"));
+
+                    byte[] profileImage = null;
+                    int profileImageIndex = cursor.getColumnIndex("profileImage");
+                    if (!cursor.isNull(profileImageIndex)) {
+                        profileImage = cursor.getBlob(profileImageIndex);
+                    }
+
+                    OtherAmount otherAmountObj = new OtherAmount(
+                            paymentId, uniqueId, firstName, month, price,
+                            handoveredTo, sessionedEmail, createdAt, description,
+                            otherAmount, profileImage
+                    );
+
+                    otherAmounts.add(otherAmountObj);
+
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e("DatabaseHelper", "Error getting other amounts: " + e.getMessage());
+        } finally {
+            if (cursor != null) cursor.close();
+        }
+
+        return otherAmounts;
+    }
+
+    public boolean addExpense(String description, double price, byte[] image) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("description", description);
+        values.put("price", price);
+        if (image != null) {
+            values.put("image", image);
+        }
+
+        // created_at will be automatically set to CURRENT_TIMESTAMP
+
+        long result = db.insert("expenses", null, values);
+        return result != -1;
+    }
+
+    // Get today's expenses
+    public double getTodayExpenses() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double todayExpenses = 0.0;
+
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        Cursor cursor = db.rawQuery(
+                "SELECT SUM(price) FROM expenses WHERE DATE(created_at) = ?",
+                new String[]{today}
+        );
+
+        if (cursor != null && cursor.moveToFirst()) {
+            todayExpenses = cursor.getDouble(0);
+            cursor.close();
+        }
+
+        return todayExpenses;
+    }
+
+    // Get all expenses
+    public Cursor getAllExpenses() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query("expenses",
+                null,
+                null,
+                null,
+                null, null, "created_at DESC");
+    }
+
+    // Get expenses for a specific date
+    public Cursor getExpensesByDate(String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query("expenses",
+                null,
+                "DATE(created_at) = ?",
+                new String[]{date},
+                null, null, "created_at DESC");
+    }
 }
+

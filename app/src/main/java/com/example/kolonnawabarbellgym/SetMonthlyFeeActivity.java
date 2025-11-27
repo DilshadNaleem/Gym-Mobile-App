@@ -13,6 +13,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.kolonnawabarbellgym.Database.DatabaseHelperClass;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,9 +24,11 @@ import java.util.Map;
 public class SetMonthlyFeeActivity extends AppCompatActivity {
 
     private TextView tvUserName, tvUserEmail;
-    private EditText etMonthlyFee;
+    private EditText etMonthlyFee, etOtherMonth;
     private Button btnSaveFee;
     private LinearLayout monthContainer;
+    private TextInputLayout tilOtherMonth;
+    private CheckBox cbOtherMonth;
     private DatabaseHelperClass databaseHelper;
     private String userUniqueId, userName, userEmail;
 
@@ -48,8 +51,11 @@ public class SetMonthlyFeeActivity extends AppCompatActivity {
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         etMonthlyFee = findViewById(R.id.etMonthlyFee);
+        etOtherMonth = findViewById(R.id.etOtherMonth);
         btnSaveFee = findViewById(R.id.btnSaveFee);
         monthContainer = findViewById(R.id.monthContainer);
+        tilOtherMonth = findViewById(R.id.tilOtherMonth);
+        cbOtherMonth = findViewById(R.id.cbOtherMonth);
         databaseHelper = new DatabaseHelperClass(this);
 
         monthCheckboxes = new HashMap<>();
@@ -105,6 +111,16 @@ public class SetMonthlyFeeActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnSaveFee.setOnClickListener(v -> saveMonthlyFee());
+
+        // Other month checkbox listener
+        cbOtherMonth.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                tilOtherMonth.setVisibility(View.VISIBLE);
+            } else {
+                tilOtherMonth.setVisibility(View.GONE);
+                etOtherMonth.setText("");
+            }
+        });
     }
 
     private void saveMonthlyFee() {
@@ -115,10 +131,23 @@ public class SetMonthlyFeeActivity extends AppCompatActivity {
             return;
         }
 
-        // Get selected months
+        // Get selected months and other month text
         List<String> selectedMonths = getSelectedMonths();
+        String otherMonthText = etOtherMonth.getText().toString().trim();
+
+        // Check if "Other" is selected but no text entered
+        if (cbOtherMonth.isChecked() && otherMonthText.isEmpty()) {
+            Toast.makeText(this, "Please enter custom month description", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Add other month if selected and has text
+        if (cbOtherMonth.isChecked() && !otherMonthText.isEmpty()) {
+            selectedMonths.add(otherMonthText);
+        }
+
         if (selectedMonths.isEmpty()) {
-            Toast.makeText(this, "Please select at least one month", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select at least one month or enter custom month", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -152,23 +181,35 @@ public class SetMonthlyFeeActivity extends AppCompatActivity {
 
     private boolean savePaymentRecords(List<String> selectedMonths, String amount) {
         boolean allSuccess = true;
-
-        // Get the email from session (assuming it's passed via intent as "remail")
         String sessionEmail = getIntent().getStringExtra("remail");
 
-        // If remail is not available, you can use a default value or get from shared preferences
         if (sessionEmail == null || sessionEmail.isEmpty()) {
-            sessionEmail = "admin@kolonnawa.com"; // default fallback
+            sessionEmail = "admin@kolonnawa.com";
         }
 
         for (String monthYear : selectedMonths) {
-            boolean success = databaseHelper.savePaymentRecord(
-                    userUniqueId,
-                    userName,
-                    monthYear,
-                    amount,
-                    sessionEmail // Pass the session email as handovered_to
-            );
+            boolean success;
+
+            // Check if this is an "Other" entry (not in standard month_year format)
+            if (isOtherMonthEntry(monthYear)) {
+                // Save as other payment
+                success = databaseHelper.saveOtherPaymentRecord(
+                        userUniqueId,
+                        userName,
+                        monthYear, // This will be the custom description
+                        amount,
+                        sessionEmail
+                );
+            } else {
+                // Save as regular monthly payment
+                success = databaseHelper.savePaymentRecord(
+                        userUniqueId,
+                        userName,
+                        monthYear,
+                        amount,
+                        sessionEmail
+                );
+            }
 
             if (!success) {
                 allSuccess = false;
@@ -176,5 +217,10 @@ public class SetMonthlyFeeActivity extends AppCompatActivity {
         }
 
         return allSuccess;
+    }
+
+    private boolean isOtherMonthEntry(String monthYear) {
+        // If it doesn't match the standard "Month_Year" pattern, it's an "Other" entry
+        return !monthYear.matches("^(January|February|March|April|May|June|July|August|September|October|November|December)_\\d{4}$");
     }
 }

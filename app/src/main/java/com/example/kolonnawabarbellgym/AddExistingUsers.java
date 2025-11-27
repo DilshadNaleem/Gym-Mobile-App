@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -52,6 +53,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -133,6 +135,10 @@ public class AddExistingUsers extends BaseActivity {
         btnDelete = findViewById(R.id.btnDelete);
         btnSubmit = findViewById(R.id.btnSubmit);
         imagePreviewLayout = findViewById(R.id.imagePreviewLayout);
+
+        if (statusRadioGroup == null) {
+            Log.e("InitializeViews", "statusRadioGroup is null - check layout ID");
+        }
     }
 
     private void setupClickListeners() {
@@ -249,11 +255,14 @@ public class AddExistingUsers extends BaseActivity {
                 // Generate PDF with the actual inserted member ID
                 generateUserPDF(insertedMemberId, firstName, lastName, email, phoneNumber, nic, monthlyFee, status);
                 clearForm();
+
+                Toast.makeText(this, "✓ Existing member added successfully!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Failed to add existing user to database", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Failed to add existing user", Toast.LENGTH_SHORT).show();
+            Log.d("Error Exception","Failed to add user",e);
+            Toast.makeText(this, "Failed to add existing user " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -269,6 +278,10 @@ public class AddExistingUsers extends BaseActivity {
             return null;
         }
 
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String currentTime = sdf.format(calendar.getTime());
+
         ContentValues values = new ContentValues();
         values.put("unique_id", nextMemberId);
         values.put("firstName", firstName);
@@ -279,6 +292,7 @@ public class AddExistingUsers extends BaseActivity {
         values.put("profileImage", profileImage);
         values.put("monthlyFee", monthlyFee);
         values.put("status", status);
+        values.put("created_time", currentTime);
 
         long result = db.insert("new_users", null, values);
         db.close();
@@ -734,7 +748,13 @@ public class AddExistingUsers extends BaseActivity {
         etPhoneNumber.setText("");
         etNIC.setText("");
         etMonthlyFee.setText("");
-        statusRadioGroup.clearCheck(); // Clear radio buttons since status is fixed
+
+        if (statusRadioGroup != null) {
+            statusRadioGroup.clearCheck();
+        } else {
+            Log.e("ClearForm", "statusRadioGroup is null - cannot clear check");
+        }
+
         deleteImage(); // This will reset the image
     }
 

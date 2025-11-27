@@ -31,9 +31,10 @@
         android:layout_marginBottom="24dp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilMonthlyFee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:hint="Monthly Fee">
 
         <EditText
@@ -48,7 +49,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Months"
+        android:text="Select Months for Payment"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
@@ -67,12 +68,51 @@
 
     </ScrollView>
 
+    <!-- Other Payment Option -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp"
+        android:background="#f5f5f5"
+        android:padding="12dp">
+
+        <CheckBox
+            android:id="@+id/cbOtherMonth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Other Payment (Custom Description)"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilOtherMonth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter custom description"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etOtherMonth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:maxLines="2"
+                android:hint="e.g., Special Training, Advance Payment, Personal Training, etc." />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/btnSaveFee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save Monthly Fee"
+        android:text="Save Monthly Fee and Payments"
+        android:textAllCaps="false"
         android:backgroundTint="#2196F3"
-        android:textColor="#FFFFFF" />
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:padding="12dp" />
 
 </LinearLayout>

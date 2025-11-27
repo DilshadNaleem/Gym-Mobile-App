@@ -6,4 +6,8 @@ public interface DashboardRepo
 {
     SalesData getSalesData();
     void refreshData();
+    double getTodayExpenses();
+    double getTotalExpenses();
+    double getTodayProfit();
+    double getTotalProfit();
 }
