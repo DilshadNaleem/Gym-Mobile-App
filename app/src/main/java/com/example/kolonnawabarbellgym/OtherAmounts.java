@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +32,8 @@ public class OtherAmounts extends AppCompatActivity {
     private List<OtherAmount> otherAmountList;
     private List<OtherAmount> filteredList;
     private EditText searchEditText;
-    private TextView tvResultsCount, tvEmptyState;
+    private TextView tvResultsCount, emptyStateTitle;
+    private LinearLayout tvEmptyState;
     private DatabaseHelperClass databaseHelper;
 
     @Override
@@ -58,6 +60,7 @@ public class OtherAmounts extends AppCompatActivity {
         searchEditText = findViewById(R.id.searchEditText);
         tvResultsCount = findViewById(R.id.tvResultsCount);
         tvEmptyState = findViewById(R.id.tvEmptyState);
+        emptyStateTitle = findViewById(R.id.tvEmptyStateTitle);
         databaseHelper = new DatabaseHelperClass(this);
 
         otherAmountList = new ArrayList<>();
@@ -140,9 +143,9 @@ public class OtherAmounts extends AppCompatActivity {
             recyclerView.setVisibility(View.GONE);
 
             if (!searchEditText.getText().toString().isEmpty()) {
-                tvEmptyState.setText("No results found for '" + searchEditText.getText().toString() + "'");
+                emptyStateTitle.setText("No results found for '" + searchEditText.getText().toString() + "'");
             } else {
-                tvEmptyState.setText("No other amounts found");
+                emptyStateTitle.setText("No other amounts found");
             }
         } else {
             tvEmptyState.setVisibility(View.GONE);

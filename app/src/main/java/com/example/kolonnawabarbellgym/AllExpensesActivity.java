@@ -32,7 +32,8 @@ public class AllExpensesActivity extends AppCompatActivity {
     private DatabaseHelperClass databaseHelper;
     private LinearLayout expensesContainer;
     private EditText etSearch;
-    private TextView tvNoExpenses, tvTotalExpenses, tvExpensesCount;
+    private TextView tvTotalExpenses, tvExpensesCount;
+    private CardView tvNoExpenses;
     private String userEmail;
 
     private List<Expense> allExpensesList = new ArrayList<>();

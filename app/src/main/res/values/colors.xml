@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Colors -->
+    <color name="colorPrimary">#FF5722</color>
+    <color name="colorPrimaryDark">#D84315</color>
+    <color name="colorPrimaryLight">#FF8A65</color>
 
+    <!-- Secondary Colors -->
+    <color name="colorSecondary">#2196F3</color>
+    <color name="colorSecondaryDark">#1976D2</color>
+    <color name="colorSecondaryLight">#64B5F6</color>
+
+    <!-- Accent Colors -->
+    <color name="colorAccent">#FFC107</color>
+    <color name="colorAccentDark">#FFA000</color>
+
+    <!-- Neutral Colors -->
+    <color name="colorBackground">#FAFAFA</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextSecondary">#757575</color>
+    <color name="colorTextHint">#BDBDBD</color>
+
+    <!-- Status Colors -->
+    <color name="colorSuccess">#4CAF50</color>
+    <color name="colorWarning">#FF9800</color>
+    <color name="colorError">#F44336</color>
+
+    <!-- Workout Specific Colors -->
+    <color name="colorStrength">#E53935</color>
+    <color name="colorCardio">#43A047</color>
+    <color name="colorFlexibility">#1E88E5</color>
+    <color name="colorRecovery">#8E24AA</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradientStart">#FF5722</color>
+    <color name="gradientEnd">#FF9800</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>

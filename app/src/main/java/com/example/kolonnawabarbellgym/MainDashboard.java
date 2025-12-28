@@ -286,58 +286,58 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
 
     private void updateVisualIndicators(SalesData salesData) {
         // Reset backgrounds
-        tvTodaySales.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tvTotalAmount.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tvPendingAdmission.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tvExistingMembers.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tvOtherAmounts.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvTodaySales.setTextColor(getResources().getColor(android.R.color.black));
+        tvTotalAmount.setTextColor(getResources().getColor(android.R.color.black));
+        tvPendingAdmission.setTextColor(getResources().getColor(android.R.color.black));
+        tvExistingMembers.setTextColor(getResources().getColor(android.R.color.black));
+        tvOtherAmounts.setTextColor(getResources().getColor(android.R.color.black));
 
         // Highlight if there are pending admissions
         if (salesData.getPendingAdmissionFees() > 0) {
-            tvPendingAdmission.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+            tvPendingAdmission.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
         }
 
         // Highlight if today's sales are good
         if (salesData.getTodaySales() > 0) {
-            tvTodaySales.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            tvTodaySales.setTextColor(getResources().getColor(android.R.color.holo_green_light));
         }
 
         // Highlight total amount received
         if (salesData.getTotalAmountOfPrices() > 0) {
-            tvTotalAmount.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            tvTotalAmount.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
         }
 
         // Highlight if there are existing members with unpaid fees
         if (salesData.getExistingMembersFees() > 0) {
-            tvExistingMembers.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            tvExistingMembers.setTextColor(getResources().getColor(android.R.color.holo_red_light));
         }
 
         if (salesData.getOtherAmount() > 0) {
-            tvOtherAmounts.setBackgroundColor(getResources().getColor(android.R.color.holo_purple));
+            tvOtherAmounts.setTextColor(getResources().getColor(android.R.color.holo_purple));
         }
     }
 
     private void updateExpenseVisualIndicators(SalesData salesData) {
         // Reset backgrounds for expense views
-        tvTodayExpenses.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tvTotalExpenses.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvTodayExpenses.setTextColor(getResources().getColor(android.R.color.black));
+        tvTotalExpenses.setTextColor(getResources().getColor(android.R.color.black));
 
         // Highlight if there are expenses today
         if (salesData.getTodayExpenses() > 0) {
-            tvTodayExpenses.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+            tvTodayExpenses.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
         }
 
         // Highlight total expenses
         if (salesData.getTotalExpenses() > 0) {
-            tvTotalExpenses.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            tvTotalExpenses.setTextColor(getResources().getColor(android.R.color.holo_red_light));
         }
     }
 
     // ADD THIS METHOD FOR PROFIT VISUAL INDICATORS
     private void updateProfitVisualIndicators(SalesData salesData) {
         // Reset backgrounds for profit views
-        tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        tvTodayProfit.setTextColor(getResources().getColor(android.R.color.black));
+        tvTotalProfit.setTextColor(getResources().getColor(android.R.color.black));
 
         // Reset text colors
         tvTodayProfit.setTextColor(getResources().getColor(android.R.color.black));
@@ -346,29 +346,29 @@ public class MainDashboard extends BaseActivity implements DashboardPresenter.Da
         // Highlight today's profit - green for profit, red for loss
         if (salesData.getTodayProfit() > 0) {
             // Profit - green background
-            tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_green_light));
             tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
         } else if (salesData.getTodayProfit() < 0) {
             // Loss - red background
-            tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_red_light));
             tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
         } else {
             // Break-even - yellow background
-            tvTodayProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+            tvTodayProfit.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
         }
 
         // Highlight total profit - green for profit, red for loss
         if (salesData.getTotalProfit() > 0) {
             // Profit - green background
-            tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+            tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_green_light));
             tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
         } else if (salesData.getTotalProfit() < 0) {
             // Loss - red background
-            tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+            tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_red_light));
             tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
         } else {
             // Break-even - yellow background
-            tvTotalProfit.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_light));
+            tvTotalProfit.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
         }
     }
 

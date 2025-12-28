@@ -18,11 +18,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class DatabaseHelperClass extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "Gym_DB";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 13;
 
     private static final String CREATE_USER_TABLE = "CREATE TABLE users(" +
             "userid INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -69,7 +70,7 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
             "description TEXT NOT NULL," +
             "image BLOB," +
             "price REAL NOT NULL," +
-            "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
+            "created_at TIMESTAMP DEFAULT (datetime('now', 'localtime')));";
 
     public DatabaseHelperClass (@Nullable Context context)
     {
@@ -537,7 +538,11 @@ public class DatabaseHelperClass extends SQLiteOpenHelper
             values.put("image", image);
         }
 
-        // created_at will be automatically set to CURRENT_TIMESTAMP
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Colombo")); // Sri Lanka timezone
+        String currentTime = sdf.format(new Date());
+
+        values.put("created_at", currentTime);
 
         long result = db.insert("expenses", null, values);
         return result != -1;

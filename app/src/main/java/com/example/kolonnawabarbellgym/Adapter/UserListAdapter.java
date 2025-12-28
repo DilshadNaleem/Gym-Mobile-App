@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.kolonnawabarbellgym.DTO.UserModel;
@@ -20,15 +22,24 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     private Context context;
     private List<UserModel> userList;
     private OnItemClickListener onItemClickListener;
+     OnItemDeleteListener onItemDeleteListener;
 
     public interface OnItemClickListener {
         void onItemClick(UserModel user);
+    }
+
+    public interface OnItemDeleteListener {
+        void onItemDelete(UserModel user);
     }
 
     public UserListAdapter(Context context, List<UserModel> userList, OnItemClickListener listener) {
         this.context = context;
         this.userList = userList;
         this.onItemClickListener = listener;
+    }
+
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) {
+        this.onItemDeleteListener = listener;
     }
 
     @NonNull
@@ -58,7 +69,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             Bitmap bitmap = BitmapFactory.decodeByteArray(user.getProfileImage(), 0, user.getProfileImage().length);
             holder.ivProfile.setImageBitmap(bitmap);
         } else {
-            holder.ivProfile.setImageResource(R.drawable.ic_person); // Create this drawable
+            holder.ivProfile.setImageResource(R.drawable.ic_person);
         }
 
         holder.itemView.setOnClickListener(v -> {
@@ -66,6 +77,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                 onItemClickListener.onItemClick(user);
             }
         });
+
+        // Add swipe background and icon
+        holder.swipeBackground.setVisibility(View.GONE);
+        holder.swipeDeleteIcon.setVisibility(View.GONE);
     }
 
     @Override
@@ -78,9 +93,25 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         notifyDataSetChanged();
     }
 
+    public void removeItem(int position) {
+        if (position >= 0 && position < userList.size()) {
+            userList.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    public UserModel getItem(int position) {
+        if (position >= 0 && position < userList.size()) {
+            return userList.get(position);
+        }
+        return null;
+    }
+
     static class UserViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProfile;
         TextView tvUserName, tvUserEmail, tvMonthlyFee;
+        View swipeBackground;
+        ImageView swipeDeleteIcon;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -88,6 +119,8 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvUserEmail = itemView.findViewById(R.id.tvUserEmail);
             tvMonthlyFee = itemView.findViewById(R.id.tvMonthlyFee);
+            swipeBackground = itemView.findViewById(R.id.swipeBackground);
+            swipeDeleteIcon = itemView.findViewById(R.id.swipeDeleteIcon);
         }
     }
 }

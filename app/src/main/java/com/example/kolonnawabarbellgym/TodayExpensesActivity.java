@@ -32,7 +32,8 @@ public class TodayExpensesActivity extends AppCompatActivity {
     private DatabaseHelperClass databaseHelper;
     private LinearLayout expensesContainer;
     private EditText etSearch;
-    private TextView tvNoExpenses, tvTotalTodayExpenses;
+    private TextView tvTotalTodayExpenses;
+    private CardView tvNoExpenses;
     private String userEmail;
 
     private List<Expense> todayExpensesList = new ArrayList<>();

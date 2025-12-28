@@ -2,51 +2,144 @@
     <string name="app_name">Kolonnawa Barbell Gym</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="lorem_ipsum">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
-        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
-        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
-        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
-        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
-        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
-        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
-        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
-        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
-        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
-        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
-        bibendum, vel congue leo egestas.\n\n
-        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
-        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
-        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
-        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
-        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
-        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
-        est.\n\n
-        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
-        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
-        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
-        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
-        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
-        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
-        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
-        convallis.\n\n
-        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
-        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
-        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
-        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
-        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
-        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
-        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
-    </string>
-    <string name="title_activity_today_expense">TodayExpenseActivity</string>
+    <!-- Main Navigation -->
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_workouts">Workouts</string>
+    <string name="title_exercises">Exercises</string>
+    <string name="title_progress">Progress</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_schedule">Schedule</string>
+    <string name="title_nutrition">Nutrition</string>
 
+    <!-- Workout Related -->
+    <string name="workout_plan">Workout Plan</string>
+    <string name="current_workout">Current Workout</string>
+    <string name="workout_history">Workout History</string>
+    <string name="create_workout">Create Workout</string>
+    <string name="start_workout">Start Workout</string>
+    <string name="pause_workout">Pause Workout</string>
+    <string name="finish_workout">Finish Workout</string>
+    <string name="workout_completed">Workout Completed!</string>
+
+    <!-- Exercise Types -->
+    <string name="exercise_strength">Strength Training</string>
+    <string name="exercise_cardio">Cardio</string>
+    <string name="exercise_flexibility">Flexibility</string>
+    <string name="exercise_warmup">Warm-up</string>
+    <string name="exercise_cooldown">Cool-down</string>
+
+    <!-- Common Actions -->
+    <string name="action_add">Add</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_next">Next</string>
+    <string name="action_previous">Previous</string>
+
+    <!-- Labels & Metrics -->
+    <string name="label_sets">Sets</string>
+    <string name="label_reps">Reps</string>
+    <string name="label_weight">Weight</string>
+    <string name="label_duration">Duration</string>
+    <string name="label_rest_time">Rest Time</string>
+    <string name="label_calories">Calories</string>
+    <string name="label_distance">Distance</string>
+    <string name="label_notes">Notes</string>
+
+    <!-- Progress Tracking -->
+    <string name="progress_weight">Weight Progress</string>
+    <string name="progress_measurements">Body Measurements</string>
+    <string name="progress_strength">Strength Progress</string>
+    <string name="progress_photos">Progress Photos</string>
+
+    <!-- Profile & Settings -->
+    <string name="profile_personal_info">Personal Information</string>
+    <string name="profile_fitness_goals">Fitness Goals</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_achievements">Achievements</string>
+
+    <!-- Welcome & Motivational Messages -->
+    <string name="welcome_message">Welcome to Kolonnawa Barbell Gym!</string>
+    <string name="motivational_quote_1">Strength doesn\'t come from what you can do. It comes from overcoming the things you once thought you couldn\'t.</string>
+    <string name="motivational_quote_2">The only bad workout is the one that didn\'t happen.</string>
+    <string name="motivational_quote_3">Don\'t wish for a good body, work for it.</string>
+
+    <!-- Empty States -->
+    <string name="empty_workouts">No workouts scheduled yet.\nTap the + button to create your first workout!</string>
+    <string name="empty_exercises">No exercises added yet.\nStart building your exercise library!</string>
+    <string name="empty_progress">No progress data yet.\nComplete your first workout to start tracking!</string>
+
+    <!-- Notifications -->
+    <string name="notification_workout_reminder">Workout Reminder</string>
+    <string name="notification_goal_achieved">Goal Achieved!</string>
+    <string name="notification_new_record">New Personal Record!</string>
+
+    <!-- Goals -->
+    <string name="goal_weight_loss">Weight Loss</string>
+    <string name="goal_muscle_gain">Muscle Gain</string>
+    <string name="goal_strength">Strength Building</string>
+    <string name="goal_endurance">Endurance</string>
+    <string name="goal_flexibility">Flexibility</string>
+
+    <!-- Time Periods -->
+    <string name="time_today">Today</string>
+    <string name="time_this_week">This Week</string>
+    <string name="time_this_month">This Month</string>
+    <string name="time_all_time">All Time</string>
+
+    <!-- Units -->
+    <string name="unit_kg">kg</string>
+    <string name="unit_lb">lb</string>
+    <string name="unit_minutes">min</string>
+    <string name="unit_seconds">sec</string>
+    <string name="unit_kcal">kcal</string>
+    <string name="unit_km">km</string>
+    <string name="unit_miles">miles</string>
+
+    <!-- Buttons -->
+    <string name="btn_log_set">Log Set</string>
+    <string name="btn_add_exercise">Add Exercise</string>
+    <string name="btn_start_timer">Start Timer</string>
+    <string name="btn_stop_timer">Stop Timer</string>
+    <string name="btn_take_photo">Take Photo</string>
+    <string name="btn_share_progress">Share Progress</string>
+
+    <!-- Dialog Titles -->
+    <string name="dialog_add_exercise">Add Exercise</string>
+    <string name="dialog_edit_exercise">Edit Exercise</string>
+    <string name="dialog_confirm_delete">Confirm Delete</string>
+    <string name="dialog_rest_timer">Rest Timer</string>
+
+    <!-- Success Messages -->
+    <string name="success_workout_saved">Workout saved successfully!</string>
+    <string name="success_exercise_added">Exercise added successfully!</string>
+    <string name="success_profile_updated">Profile updated successfully!</string>
+
+    <!-- Error Messages -->
+    <string name="error_required_field">This field is required</string>
+    <string name="error_invalid_weight">Please enter a valid weight</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+
+    <!-- Gym Specific -->
+    <string name="gym_location">Kolonnawa, Sri Lanka</string>
+    <string name="gym_hours">Open 24/7</string>
+    <string name="gym_contact">Contact Us</string>
+    <string name="gym_trainers">Our Trainers</string>
+    <string name="gym_facilities">Facilities</string>
+
+    <!-- Sample exercise names -->
+    <string name="exercise_bench_press">Bench Press</string>
+    <string name="exercise_squat">Squat</string>
+    <string name="exercise_deadlift">Deadlift</string>
+    <string name="exercise_shoulder_press">Shoulder Press</string>
+    <string name="exercise_pull_ups">Pull-ups</string>
+    <string name="exercise_push_ups">Push-ups</string>
+    <string name="exercise_running">Running</string>
+    <string name="exercise_cycling">Cycling</string>
+    <string name="exercise_stretching">Stretching</string>
+    <string name="title_activity_today_expense">Today\'s Expenses</string>
 </resources>

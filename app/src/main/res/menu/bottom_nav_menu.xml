@@ -7,22 +7,22 @@
 
     <item
         android:id="@+id/navigation_fee"
-        android:icon="@drawable/ic_dashboard"
-        android:title="Fee" />
+        android:icon="@drawable/ic_money"
+        android:title="Fee " />
 
     <item
         android:id="@+id/navigation_profile"
-        android:icon="@drawable/ic_dashboard"
+        android:icon="@drawable/ic_person"
         android:title="Profile" />
 
     <item
         android:id="@+id/navigation_newuser"
-        android:icon="@drawable/ic_dashboard"
+        android:icon="@drawable/ic_person_add"
         android:title="New User" />
 
     <item
         android:id="@+id/navigation_existinguser"
-        android:icon="@drawable/ic_dashboard"
+        android:icon="@drawable/ic_person_existing"
         android:title="Existing User" />
 
 

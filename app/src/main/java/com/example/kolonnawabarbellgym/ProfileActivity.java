@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.kolonnawabarbellgym.DTO.User;
 import com.example.kolonnawabarbellgym.Database.DatabaseHelperClass;
 import com.example.kolonnawabarbellgym.DatabaseController.ProfileController;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
 import java.io.IOException;
@@ -30,7 +31,8 @@ public class ProfileActivity extends BaseActivity {
     private ImageView profileImage;
     private TextView textEmail;
     private EditText editFirstName, editLastName, editPhoneNumber, editNIC;
-    private Button btnUpdate, btnChangeImage;
+    private Button btnUpdate;
+    private FloatingActionButton btnChangeImage;
 
     private DatabaseHelperClass dbHelper;
     private ProfileController profileController;
@@ -85,6 +87,10 @@ public class ProfileActivity extends BaseActivity {
             editLastName.setText(currentUser.getLastName());
             editPhoneNumber.setText(currentUser.getPhoneNumber());
             editNIC.setText(currentUser.getNic());
+
+            TextView textFullName = findViewById(R.id.text_full_name);
+            String fullName = currentUser.getFirstName() + " " + currentUser.getLastName();
+            textFullName.setText(fullName);
 
             // Load profile image if exists
             if (currentUser.getProfileImagge() != null) {

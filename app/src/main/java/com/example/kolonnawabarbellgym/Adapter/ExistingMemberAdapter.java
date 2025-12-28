@@ -89,6 +89,7 @@ public class ExistingMemberAdapter extends RecyclerView.Adapter<ExistingMemberAd
         return membersList.size();
     }
 
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProfile;
         TextView tvMemberName, tvMonthlyFee, tvUnpaidMonths, tvTotalDue, tvLastPayment;
@@ -103,4 +104,6 @@ public class ExistingMemberAdapter extends RecyclerView.Adapter<ExistingMemberAd
             tvLastPayment = itemView.findViewById(R.id.tvLastPayment);
         }
     }
+
+
 }

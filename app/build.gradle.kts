@@ -61,4 +61,5 @@ dependencies {
     implementation ("com.itextpdf:itext7-core:7.2.5")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation ("com.google.android.material:material:1.9.0")
+    implementation ("com.airbnb.android:lottie:6.1.0")
 }
