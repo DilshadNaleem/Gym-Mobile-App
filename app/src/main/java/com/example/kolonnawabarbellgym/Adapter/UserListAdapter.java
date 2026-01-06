@@ -3,11 +3,14 @@ package com.example.kolonnawabarbellgym.Adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -73,9 +76,22 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if (onItemClickListener != null) {
-                onItemClickListener.onItemClick(user);
+            // ADD LOGS HERE - This is where the click is handled
+            Log.d("UserListAdapter", "Item clicked at position: " + position);
+            Log.d("UserListAdapter", "User name: " + user.getFullName());
+            Log.d("UserListAdapter", "User ID: " + user.getUniqueId());
+
+            // Test if onItemClickListener is null
+            if (onItemClickListener == null) {
+                Log.e("UserListAdapter", "onItemClickListener is NULL!");
+                // You can also show a toast for debugging
+                Toast.makeText(context, "ClickListener is null", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                Log.d("UserListAdapter", "onItemClickListener is NOT null, calling onItemClick...");
             }
+
+            onItemClickListener.onItemClick(user);
         });
 
         // Add swipe background and icon

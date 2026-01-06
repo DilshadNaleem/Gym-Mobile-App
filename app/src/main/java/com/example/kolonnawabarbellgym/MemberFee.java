@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -118,7 +119,11 @@ public class MemberFee extends BaseActivity implements
 
         filteredList.clear();
         filteredList.addAll(userList);
-        adapter.updateList(filteredList);
+
+        // IMPORTANT: Notify adapter after data is loaded
+        if (adapter != null) {
+            adapter.updateList(filteredList);
+        }
 
         updateEmptyState();
         updateMemberCount();
@@ -192,6 +197,10 @@ public class MemberFee extends BaseActivity implements
 
     @Override
     public void onItemClick(UserModel user) {
+        Log.d("MemberFee", "onItemClick called for user: " + user.getFullName());
+        Log.d("MemberFee", "User uniqueId: " + user.getUniqueId());
+        Log.d("MemberFee", "User email: " + user.getEmail());
+
         // Add click animation
         Animation scaleDown = AnimationUtils.loadAnimation(this, R.anim.scale_down);
         Animation scaleUp = AnimationUtils.loadAnimation(this, R.anim.scale_up);
@@ -203,14 +212,23 @@ public class MemberFee extends BaseActivity implements
         intent.putExtra("user_email", user.getEmail());
         intent.putExtra("current_fee", user.getMonthlyFee() != null ? user.getMonthlyFee() : "");
 
+        Log.d("MemberFee", "Intent created: " + intent.toString());
+
         String remail = getIntent().getStringExtra("remail");
         if (remail != null) {
             intent.putExtra("remail", remail);
         }
 
-        // Start activity with animation
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        try {
+            // Start activity with animation
+            startActivity(intent);
+            Log.d("MemberFee", "Activity started successfully");
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        } catch (Exception e) {
+            Log.e("MemberFee", "Error starting activity: " + e.getMessage());
+            e.printStackTrace();
+            Toast.makeText(this, "Cannot open fee settings", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

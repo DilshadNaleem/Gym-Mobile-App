@@ -34,7 +34,7 @@ public class RegisterController
         values.put("phoneNumber", user.getPhoneNumber());
         values.put("nic", user.getNic());
         values.put("password", user.getPassword());
-        values.put("status", user.getStatus());
+        values.put("status", 1);
         values.put("loggedIn", user.getLoggedIn());
 
         long result = db.insert("users", null, values);
